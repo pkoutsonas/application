@@ -7,7 +7,7 @@ const MainLayout = () => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen pt-16">
+      <div className="min-h-screen pt-16 relative">
         {/* Classes for the blur effect (styling) */}
         <div
           className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"

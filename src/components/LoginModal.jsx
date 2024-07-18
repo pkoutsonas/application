@@ -1,11 +1,10 @@
-// LoginModal.jsx
 import React from "react";
 
 const LoginModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
+    <div className="fixed top-0 left-0 right-0 bottom-0 bg-gray-600 bg-opacity-10 flex justify-center items-center z-50">
       <div className="bg-white rounded-lg p-6 relative w-96">
         <button
           className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"

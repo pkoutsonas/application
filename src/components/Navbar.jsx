@@ -26,7 +26,7 @@ const Navbar = () => {
       <div className="container mx-auto flex justify-between items-center">
         <div className="text-white text-lg">JobLand.gr</div>
         <div className="text-white flex space-x-4">
-          {["Home", "About", "Jobs", "Pricing"].map((item) => (
+          {["Home", "Jobs", "About"].map((item) => (
             <Link
               key={item}
               to={`/${item.toLowerCase()}`}

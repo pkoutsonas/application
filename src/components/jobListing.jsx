@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import JobPost from "./Jobpost.jsx";
 import PageTracker from "./PageTracker.jsx";
 
@@ -9,7 +8,7 @@ const JobListing = () => {
       title: "Olive Gardener",
       company: "Company A",
       location: "Trikala, Greece",
-      salary: "900/ monthly",
+      salary: "900 /monthly",
       description:
         "Looking for a skilled worker with experience in olive oil production.",
     },
@@ -17,7 +16,7 @@ const JobListing = () => {
       title: "Veterinary Doctor",
       company: "Company B",
       location: "Larisa, Greece",
-      salary: "40/ daily",
+      salary: "40 /daily",
       description:
         "We need a veterinary doctor with experience in cattle care.",
     },
@@ -25,7 +24,7 @@ const JobListing = () => {
       title: "Doctor",
       company: "Company c",
       location: "Larisa, Greece",
-      salary: "100/ daily",
+      salary: "100 /daily",
       description: "lorem ipsum.",
     },
     {
@@ -165,41 +164,59 @@ const JobListing = () => {
     },
   ];
 
+  const truncateDescription = (description, wordLimit) => {
+    const words = description.split(" ");
+    if (words.length > wordLimit) {
+      return words.slice(0, wordLimit).join(" ") + "...";
+    }
+    return description;
+  };
+
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 6;
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
   // Υπολογισμός των αντικειμένων που θα εμφανιστούν στην τρέχουσα σελίδα
+
+  // Filtering the jobs based on location
+
+  // Calculate current jobs based on pagination
   const indexOfLastJob = currentPage * itemsPerPage;
   const indexOfFirstJob = indexOfLastJob - itemsPerPage;
   const currentJobs = jobs.slice(indexOfFirstJob, indexOfLastJob);
 
   return (
     <div>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto py-8 ml-64 flex-1">
         <h1 className="text-2xl font-bold mb-6">
           Find the job that suits you most!
         </h1>
         <h3 className="text-xl font-bold mb-6">Every opportunity is here</h3>
-        {currentJobs.map((job, index) => (
-          <JobPost
-            key={index}
-            title={job.title}
-            company={job.company}
-            location={job.location}
-            salary={job.salary}
-            description={job.description}
+        <div className="grid justify-self-stretch">
+          {currentJobs.map((job, index) => (
+            <JobPost
+              key={index}
+              title={job.title}
+              company={job.company}
+              location={job.location}
+              salary={job.salary}
+              description={truncateDescription(job.description, 20)}
+            />
+          ))}
+        </div>
+      </div>
+      <div className="flex justify-items-stretch mt-8">
+        <div className="grow">
+          <PageTracker
+            totalItems={jobs.length}
+            itemsPerPage={itemsPerPage}
+            currentPage={currentPage}
+            handlePageChange={handlePageChange}
           />
-        ))}
-        <PageTracker
-          totalItems={jobs.length}
-          itemsPerPage={itemsPerPage}
-          currentPage={currentPage}
-          handlePageChange={handlePageChange}
-        />
+        </div>
       </div>
     </div>
   );
