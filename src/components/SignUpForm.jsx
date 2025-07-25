@@ -1,18 +1,92 @@
 import React from "react";
 import { useState } from "react";
-import { UserCircleIcon } from "@heroicons/react/24/solid";
+import { Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
 
+  const [formData, setFormData] = useState({
+    user: {
+      username: "",
+      email: "",
+      password: "",
+      first_name: "",
+      last_name: "",
+    },
+    employee: {
+      address: "",
+      city: "",
+      state: "",
+      zipcode: "",
+      country: "",
+      phone_number: "",
+    },
+  }); //Initialize the data
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    const [type, field] = name.split("."); // Χωρίζουμε το όνομα του πεδίου
+
+    // Ενημέρωση της κατάστασης ανάλογα με το αν είναι user ή employee
+    setFormData((prev) => ({
+      ...prev,
+      [type]: {
+        ...prev[type],
+        [field]: value, // Ενημερώνουμε το πεδίο
+      },
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validation (π.χ. αν το email είναι έγκυρο)
+    if (!formData.user.email.includes("@")) {
+      alert("Please enter a valid email.");
+      return;
+    }
+
+    const response = await fetch("/api/register_employee/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user: {
+          username: formData.user.username,
+          email: formData.user.email,
+          password: formData.user.password,
+          first_name: formData.user.first_name,
+          last_name: formData.user.last_name,
+        },
+        employee: {
+          address: formData.employee.address,
+          city: formData.employee.city,
+          state: formData.employee.state,
+          zipcode: formData.employee.zipcode,
+          phone_number: formData.employee.phone_number,
+        },
+      }),
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      // Handle successful registration
+      console.log("Registration successful:", result);
+    } else {
+      // Handle errors and display to the user
+      setError(result.error || "An unknown error occurred.");
+    }
+  };
+
   return (
     <div>
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="space-y-12">
           <div className="border-b border-gray-900/10 pb-12">
             <h2 className="text-base font-semibold leading-7 text-gray-900">
@@ -35,8 +109,10 @@ const SignUpForm = () => {
                     <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm"></span>
                     <input
                       id="username"
-                      name="username"
+                      name="user.username"
                       type="text"
+                      value={formData.user.username}
+                      onChange={handleChange}
                       placeholder="janesmith"
                       autoComplete="username"
                       className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
@@ -61,6 +137,8 @@ const SignUpForm = () => {
                       name="password"
                       type={showPassword ? "text" : "password"}
                       placeholder=""
+                      value={formData.user.password}
+                      onChange={handleChange}
                       autoComplete="current-password"
                       className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
                     />
@@ -75,25 +153,6 @@ const SignUpForm = () => {
               </div>
             </div>
             <br />
-            {/* Profile Picture not Used */}
-            {/* <div className="col-span-full">
-              <label
-                htmlFor="photo"
-                className="block text-sm font-medium leading-6 text-gray-900">
-                Photo
-              </label>
-              <div className="mt-2 flex items-center gap-x-3">
-                <UserCircleIcon
-                  aria-hidden="true"
-                  className="h-12 w-12 text-gray-300"
-                />
-                <button
-                  type="button"
-                  className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                  Change
-                </button>
-              </div>
-            </div>*/}
           </div>
 
           <div className="border-b border-gray-900/10 pb-12">
@@ -114,8 +173,10 @@ const SignUpForm = () => {
                 <div className="mt-2">
                   <input
                     id="first-name"
-                    name="first-name"
+                    name="user.first-name"
                     type="text"
+                    value={formData.user.first_name}
+                    onChange={handleChange}
                     autoComplete="given-name"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
@@ -131,8 +192,10 @@ const SignUpForm = () => {
                 <div className="mt-2">
                   <input
                     id="last-name"
-                    name="last-name"
+                    name="user.last-name"
                     type="text"
+                    value={formData.user.last_name}
+                    onChange={handleChange}
                     autoComplete="family-name"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
@@ -150,6 +213,8 @@ const SignUpForm = () => {
                     id="email"
                     name="email"
                     type="email"
+                    value={formData.user.email}
+                    onChange={handleChange}
                     autoComplete="email"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
@@ -165,8 +230,10 @@ const SignUpForm = () => {
                 <div className="mt-2">
                   <select
                     id="country"
-                    name="country"
+                    name="employee.country"
                     autoComplete="country-name"
+                    value={formData.employee.country}
+                    onChange={handleChange}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
                     <option>United States</option>
                     <option>Canada</option>
@@ -184,8 +251,10 @@ const SignUpForm = () => {
                 <div className="mt-2">
                   <input
                     id="street-address"
-                    name="street-address"
+                    name="employee.address"
                     type="text"
+                    value={formData.employee.address}
+                    onChange={handleChange}
                     autoComplete="street-address"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
@@ -201,8 +270,10 @@ const SignUpForm = () => {
                 <div className="mt-2">
                   <input
                     id="city"
-                    name="city"
+                    name="employee.city"
                     type="text"
+                    value={formData.employee.city}
+                    onChange={handleChange}
                     autoComplete="address-level2"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
@@ -218,8 +289,10 @@ const SignUpForm = () => {
                 <div className="mt-2">
                   <input
                     id="region"
-                    name="region"
+                    name="employee.state"
                     type="text"
+                    value={formData.employee.state}
+                    onChange={handleChange}
                     autoComplete="address-level1"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
@@ -235,76 +308,49 @@ const SignUpForm = () => {
                 <div className="mt-2">
                   <input
                     id="postal-code"
-                    name="postal-code"
+                    name="employee.zipcode"
                     type="text"
+                    value={formData.employee.zipcode}
+                    onChange={handleChange}
                     autoComplete="postal-code"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
+              <div className="sm:col-span-2 sm:col-start-1">
+                <label
+                  htmlFor="phone"
+                  className="text-sm font-medium leading-6 text-gray-900">
+                  Phone Number
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="phone"
+                    name="employee.phone_number"
+                    type="text"
+                    value={formData.employee.phone_number}
+                    onChange={handleChange}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
                 </div>
               </div>
             </div>
           </div>
-
-          <div className="border-b border-gray-900/10 pb-12">
-            <div className="mt-10 space-y-10">
-              <fieldset>
-                <legend className="text-sm font-semibold leading-6 text-gray-900">
-                  By Email
-                </legend>
-                <div className="mt-6 space-y-6">
-                  <div className="relative flex gap-x-3">
-                    <div className="flex h-6 items-center">
-                      <input
-                        id="candidates"
-                        name="candidates"
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                      />
-                    </div>
-                    <div className="text-sm leading-6">
-                      <label
-                        htmlFor="candidates"
-                        className="font-medium text-gray-900">
-                        Candidates
-                      </label>
-                      <p className="text-gray-500">
-                        Get notified when a candidate applies for a job.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="relative flex gap-x-3">
-                    <div className="flex h-6 items-center">
-                      <input
-                        id="offers"
-                        name="offers"
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                      />
-                    </div>
-                    <div className="text-sm leading-6">
-                      <label
-                        htmlFor="offers"
-                        className="font-medium text-gray-900">
-                        Offers
-                      </label>
-                      <p className="text-gray-500">
-                        Get notified when a candidate accepts or rejects an
-                        offer.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </fieldset>
-            </div>
-          </div>
         </div>
         <div>
           <div className="mt-6 flex items-center justify-between gap-x-6">
-            <button
-              type="button"
-              className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-              For Employers
-            </button>
+            <Link
+              to="/companysignup"
+              className="text-sm font-semibold leading-6 text-gray-900">
+              <span aria-hidden="true">
+                &larr;{" "}
+                <button
+                  type="button"
+                  className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                  For Employers
+                </button>
+              </span>
+            </Link>
             <div className="flex gap-x-6">
               <button
                 type="button"

@@ -10,7 +10,12 @@ import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import JobsPage from "./pages/JobsPage";
 import SignUpPage from "./pages/SignUpPage";
+import CompanySignUp from "./pages/CompanySignUp";
 import NotFound from "./pages/NotFound";
+import { UserProvider } from "./components/UserContext";
+import EmployerProfilePage from "./pages/EmployerProfilePage";
+import Dashboard from "./components/Dashboard";
+import NewJobForm from "./components/NewJobForm";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -21,12 +26,20 @@ const router = createBrowserRouter(
       <Route path="/about" element={<AboutPage />} />
       <Route path="/jobs" element={<JobsPage />} />
       <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/companysignup" element={<CompanySignUp />} />
+      <Route path="/company/:id" element={<EmployerProfilePage />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/jobs/new" element={<NewJobForm />} />
     </Route>
   )
 );
 
 const App = () => {
-  return <RouterProvider router={router} />;
+  return (
+    <UserProvider>
+      <RouterProvider router={router} />
+    </UserProvider>
+  );
 };
 
 export default App;

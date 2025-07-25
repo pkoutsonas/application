@@ -1,168 +1,33 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import JobPost from "./Jobpost.jsx";
 import PageTracker from "./PageTracker.jsx";
+import JobFilter from "./JobFilter.jsx";
 
 const JobListing = () => {
-  const jobs = [
-    {
-      title: "Olive Gardener",
-      company: "Company A",
-      location: "Trikala, Greece",
-      salary: "900 /monthly",
-      description:
-        "Looking for a skilled worker with experience in olive oil production.",
-    },
-    {
-      title: "Veterinary Doctor",
-      company: "Company B",
-      location: "Larisa, Greece",
-      salary: "40 /daily",
-      description:
-        "We need a veterinary doctor with experience in cattle care.",
-    },
-    {
-      title: "Doctor",
-      company: "Company c",
-      location: "Larisa, Greece",
-      salary: "100 /daily",
-      description: "lorem ipsum.",
-    },
-    {
-      title: "Veterinary Doctor",
-      company: "Company B",
-      location: "Larisa, Greece",
-      salary: "40/ daily",
-      description:
-        "We need a veterinary doctor with experience in cattle care.",
-    },
-    {
-      title: "Software Engineer",
-      company: "Company Tornos",
-      location: "Larisa, Greece",
-      salary: "40/ daily",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum dapibus cursus libero, sed sollicitudin diam fermentum vitae.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum dapibus cursus libero, sed sollicitudin diam fermentum vitae.",
-    },
-    {
-      title: "Olive Gardener",
-      company: "Company A",
-      location: "Trikala, Greece",
-      salary: "900/ monthly",
-      description:
-        "Looking for a skilled worker with experience in olive oil production.",
-    },
-    {
-      title: "Veterinary Doctor",
-      company: "Company B",
-      location: "Larisa, Greece",
-      salary: "40/ daily",
-      description:
-        "We need a veterinary doctor with experience in cattle care.",
-    },
-    {
-      title: "Doctor",
-      company: "Company asd",
-      location: "Athens, Greece",
-      salary: "100/ daily",
-      description: "lorem ipsum.",
-    },
-    {
-      title: "ajnfrisgbosngvs",
-      company: "Company B",
-      location: "Thessaloniki, Greece",
-      salary: "40/ daily",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum dapibus cursus libero, sed sollicitudin diam fermentum vitae. Fusce nisl orci, scelerisque at tristique sit amet, suscipit ut diam. Pellentesque cursus.",
-    },
-    {
-      title: "Veterinary Doctor",
-      company: "Company Trikala",
-      location: "Larisa, Greece",
-      salary: "40/ daily",
-      description:
-        "We need a veterinary doctor with experience in cattle care.",
-    },
-    {
-      title: "Olive Gardener",
-      company: "Company A",
-      location: "Trikala, Greece",
-      salary: "900/ monthly",
-      description:
-        "Looking for a skilled worker with experience in olive oil production.",
-    },
-    {
-      title: "Vineyard Worker",
-      company: "Company B",
-      location: "Nemea, Greece",
-      salary: "850/ monthly",
-      description:
-        "Seeking an experienced vineyard worker for grape harvesting and wine production.",
-    },
-    {
-      title: "Farm Manager",
-      company: "Company C",
-      location: "Larissa, Greece",
-      salary: "1200/ monthly",
-      description:
-        "Looking for a farm manager with knowledge in crop management and animal husbandry.",
-    },
-    {
-      title: "Greenhouse Technician",
-      company: "Company D",
-      location: "Volos, Greece",
-      salary: "950/ monthly",
-      description:
-        "Seeking a technician with experience in greenhouse management and plant care.",
-    },
-    {
-      title: "Fruit Picker",
-      company: "Company E",
-      location: "Kavala, Greece",
-      salary: "800/ monthly",
-      description:
-        "Looking for reliable fruit pickers for seasonal work in orchards.",
-    },
-    {
-      title: "Agricultural Engineer",
-      company: "Company F",
-      location: "Thessaloniki, Greece",
-      salary: "1500/ monthly",
-      description:
-        "Seeking an agricultural engineer with expertise in irrigation and soil management.",
-    },
-    {
-      title: "Dairy Farm Worker",
-      company: "Company G",
-      location: "Ioannina, Greece",
-      salary: "900/ monthly",
-      description:
-        "Looking for a dairy farm worker to assist with milking and general farm tasks.",
-    },
-    {
-      title: "Organic Farmer",
-      company: "Company H",
-      location: "Patras, Greece",
-      salary: "950/ monthly",
-      description:
-        "Seeking an organic farmer with experience in sustainable farming practices.",
-    },
-    {
-      title: "Tractor Operator",
-      company: "Company I",
-      location: "Heraklion, Greece",
-      salary: "1000/ monthly",
-      description:
-        "Looking for an experienced tractor operator for fieldwork and equipment maintenance.",
-    },
-    {
-      title: "Agronomy Specialist",
-      company: "Company J",
-      location: "Athens, Greece",
-      salary: "1400/ monthly",
-      description:
-        "Seeking an agronomy specialist with knowledge in crop science and pest control.",
-    },
-  ];
+  const [jobs, setJobs] = useState([]);
+  const [filteredJobs, setFilteredJobs] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortOption, setSortOption] = useState("date_desc"); // Default sorting by date
+  const itemsPerPage = 6;
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+
+  const fetchJobs = async () => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/jobs/", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      });
+      setJobs(response.data);
+      setFilteredJobs(response.data); // Set both jobs and filteredJobs initially
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+    }
+  };
 
   const truncateDescription = (description, wordLimit) => {
     const words = description.split(" ");
@@ -172,51 +37,131 @@ const JobListing = () => {
     return description;
   };
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
-  // Υπολογισμός των αντικειμένων που θα εμφανιστούν στην τρέχουσα σελίδα
+  const handleFilter = ({ location, minSalary, maxSalary }) => {
+    const result = jobs.filter((job) => {
+      const matchesLocation = location
+        ? job.location.toLowerCase().includes(location.toLowerCase())
+        : true;
+      const matchesMin = minSalary ? job.salary >= minSalary : true;
+      const matchesMax = maxSalary ? job.salary <= maxSalary : true;
+      return matchesLocation && matchesMin && matchesMax;
+    });
+    setFilteredJobs(result);
+    setCurrentPage(1);
+  };
 
-  // Filtering the jobs based on location
+  // Handle sorting based on the selected option
 
-  // Calculate current jobs based on pagination
+  const handleSort = (option) => {
+    setSortOption(option);
+
+    const jobsToSort = [...(filteredJobs.length > 0 ? filteredJobs : jobs)];
+
+    let sortedJobs = [];
+
+    switch (option) {
+      case "date_desc":
+        sortedJobs = jobsToSort.sort(
+          (a, b) => new Date(b.published_at) - new Date(a.published_at)
+        );
+        break;
+      case "date_asc":
+        sortedJobs = jobsToSort.sort(
+          (a, b) => new Date(a.published_at) - new Date(b.published_at)
+        );
+        break;
+      case "salary_desc":
+        sortedJobs = jobsToSort.sort((a, b) => b.salary - a.salary);
+        break;
+      case "salary_asc":
+        sortedJobs = jobsToSort.sort((a, b) => a.salary - b.salary);
+        break;
+      default:
+        sortedJobs = jobsToSort;
+    }
+
+    if (filteredJobs.length > 0) {
+      setFilteredJobs(sortedJobs);
+    } else {
+      setJobs(sortedJobs);
+    }
+
+    setCurrentPage(1); // reset pagination
+  };
+
+  const jobsToDisplay = filteredJobs.length > 0 ? filteredJobs : jobs;
   const indexOfLastJob = currentPage * itemsPerPage;
   const indexOfFirstJob = indexOfLastJob - itemsPerPage;
-  const currentJobs = jobs.slice(indexOfFirstJob, indexOfLastJob);
+  const currentJobs = jobsToDisplay.slice(indexOfFirstJob, indexOfLastJob);
 
   return (
-    <div>
-      <div className="container mx-auto py-8 ml-64 flex-1">
-        <h1 className="text-2xl font-bold mb-6">
-          Find the job that suits you most!
-        </h1>
-        <h3 className="text-xl font-bold mb-6">Every opportunity is here</h3>
-        <div className="grid justify-self-stretch">
-          {currentJobs.map((job, index) => (
-            <JobPost
-              key={index}
-              title={job.title}
-              company={job.company}
-              location={job.location}
-              salary={job.salary}
-              description={truncateDescription(job.description, 20)}
-            />
-          ))}
+    <div className="flex">
+      {/* Sidebar - Filter */}
+      <div className="w-1/6">
+        <div className="fixed top-1/2 left-8 transform -translate-y-1/2 w-60">
+          {/* Sorting Dropdown */}
+          <div className="mb-6">
+            <label className="block text-md font-semibold mb-2">Sort by:</label>
+            <select
+              value={sortOption}
+              onChange={(e) => handleSort(e.target.value)}
+              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500">
+              <option value="date_desc">Date (Newest First)</option>
+              <option value="date_asc">Date (Oldest First)</option>
+              <option value="salary_desc">Salary (Highest First)</option>
+              <option value="salary_asc">Salary (Lowest First)</option>
+            </select>
+          </div>
+
+          {/* Filter Component */}
+          <JobFilter onFilter={handleFilter} />
         </div>
       </div>
-      <div className="flex justify-items-stretch mt-8">
-        <div className="grow">
-          <PageTracker
-            totalItems={jobs.length}
-            itemsPerPage={itemsPerPage}
-            currentPage={currentPage}
-            handlePageChange={handlePageChange}
-          />
+
+      {/* Job Listings */}
+      <div className="w-5/6 ml-auto px-8 py-8">
+        <div className="flex-1">
+          <h1 className="text-2xl font-bold mb-6">
+            Find the job that suits you most!
+          </h1>
+          <h3 className="text-xl font-bold mb-6">Every opportunity is here</h3>
+
+          {/* Job Posts */}
+          <div className="grid gap-4">
+            {currentJobs.length > 0 ? (
+              currentJobs.map((job, index) => (
+                <JobPost
+                  key={index}
+                  published_at={job.published_at}
+                  title={job.title}
+                  company={job.company}
+                  company_name={job.company_name}
+                  location={job.location}
+                  salary={job.salary}
+                  description={truncateDescription(job.description, 20)}
+                />
+              ))
+            ) : (
+              <div className="text-center w-full mt-4">No jobs found.</div>
+            )}
+          </div>
         </div>
+
+        {/* Pagination */}
+        {jobsToDisplay.length > itemsPerPage && (
+          <div className="flex justify-center mt-8">
+            <PageTracker
+              totalItems={jobsToDisplay.length}
+              itemsPerPage={itemsPerPage}
+              currentPage={currentPage}
+              handlePageChange={handlePageChange}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

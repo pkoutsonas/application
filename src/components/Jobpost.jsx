@@ -1,16 +1,38 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { FaMapMarker } from "react-icons/fa";
 
-const JobPost = ({ title, company, salary, location, description }) => {
+const JobPost = ({
+  title,
+  company,
+  company_name,
+  salary,
+  location,
+  description,
+  published_at,
+}) => {
   return (
     <div>
       <div className="bg-white shadow-md rounded-lg p-6 mb-4 w-full max-w-xl">
-        <h2 className="text-xl font-bold mb-2">{title}</h2>
-        <h3 className="text-lg text-gray-700 mb-1">{company}</h3>
+        <div className="flex justify-between">
+          <h2 className="text-xl font-bold mb-2">{title}</h2>
+          {published_at ? (
+            <p className="text-gray-600 text-sm">
+              {new Date(published_at).toLocaleDateString("el-GR")}
+            </p>
+          ) : (
+            <p className="text-gray-600 text-sm">Date not available</p>
+          )}
+        </div>
+        <Link
+          to={`/company/${company}`}
+          className="text-lg text-blue-700 hover:underline mb-1">
+          {company_name}
+        </Link>
         <p className="text-gray-600">{description}</p>
         <div className="grid grid-cols-3 gap-2 mt-4 justify-items-center items-center">
           <p className="text-gray-600 text-center font-bold">
-            Salary: {salary} $
+            Salary: {salary} € / month
           </p>
           <p className="text-orange-800 flex items-center">
             <FaMapMarker className="mr-1" /> {location}
